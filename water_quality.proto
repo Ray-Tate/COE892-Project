@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package waterquality;
+
+// Message representing the data quality of a station (pH, turbidity, pollutants).
+message QualityData {
+    float pH = 1;
+    float turbidity = 2;
+    float pollutants = 3;
+}
+
+// Request from a client (water monitoring station) to get data quality.
+message StationRequest {
+    string station_id = 1;
+}
+
+// Response sent from the server with the requested quality data.
+message StationResponse {
+    string station_id = 1;
+    float pH = 2;
+    float turbidity = 3;
+    float pollutants = 4;
+}
+
+// Request to report an issue detected at a station.
+message IssueReport {
+    string station_id = 1;
+    string issue_type = 2;
+    double timestamp = 3;
+}
+
+// Acknowledgement response for reported issues.
+message StatusResponse {
+    string message = 1;
+    bool success = 2;
+}
+
+// Request to add a neighbour to a station's list of neighbours.
+message AddNeighbourRequest {
+    string station_id = 1;
+    string neighbour_id = 2;
+}
+
+// Notification sent to neighbour stations when an issue is detected.
+message NeighbourNotification {
+    string station_id = 1;
+    string issue_type = 2;
+}
+
+// Request to register a station with the server.
+message RegisterStationRequest {
+    string station_id = 1;
+}
+
+// Response to acknowledge station registration.
+message RegisterStationResponse {
+    string message = 1;
+    bool success = 2;
+}
+
+// The server-side service definition for controlling and monitoring stations.
+service WaterControlCenter {
+    // Retrieve the quality data for a specific station.
+    rpc GetQualityData(StationRequest) returns (StationResponse);
+
+    // Report an issue detected at a specific station.
+    rpc ReportIssue(IssueReport) returns (StatusResponse);
+
+    // Add a station as a neighbour to another station.
+    rpc AddNeighbour(AddNeighbourRequest) returns (StatusResponse);
+
+    // Notify neighbour stations of an issue detected at a station.
+    rpc NotifyNeighbours(NeighbourNotification) returns (StatusResponse);
+
+    // Register a new station with the server.
+    rpc RegisterStation(RegisterStationRequest) returns (RegisterStationResponse);
+}
